@@ -46,7 +46,6 @@ namespace SCP056Plugin
             EventHandlers = new EventHandlers(this);
             Exiled.Events.Handlers.Server.EndingRound += EventHandlers.OnEndingRound;
             Exiled.Events.Handlers.Player.Spawned += EventHandlers.OnSpawned;
-            Exiled.Events.Handlers.Player.Hurting += EventHandlers.OnHurting;
 
             _harmonyId = $"com.joker.035-{DateTime.Now.Ticks}";
             _harmony = new Harmony(_harmonyId);

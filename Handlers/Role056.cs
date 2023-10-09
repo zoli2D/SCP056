@@ -22,6 +22,9 @@
     using RoleTypeId = PlayerRoles.RoleTypeId;
     using Exiled.Events.EventArgs.Cassie;
     using Exiled.CustomRoles.Events;
+    using Exiled.Events.EventArgs.Server;
+    using System.ComponentModel;
+    using PlayerEvent = Exiled.Events.Handlers.Player;
 
     /// <summary>
     /// The <see cref="CustomRole"/> handler for SCP-056.
@@ -188,26 +191,50 @@
             base.RoleRemoved(player);
         }
 
+        protected override void SubscribeEvents()
+        {
+            PlayerEvent.EnteringPocketDimension += OnEnteringPocketDimension;
+            PlayerEvent.Hurting += OnHurting;
+            PlayerEvent.Shooting += OnShooting;
+            PlayerEvent.ActivatingGenerator += OnActivatingGenerator;
 
-
+            base.SubscribeEvents();
+        }
+        
 
 
         private void OnDying(DyingEventArgs ev)
         {
-            if (Check(ev.Player))
-                SCP056Plugin.Instance.StopRagdollsList.Add(ev.Player);
-                string message = $"SCP 0 5 6 has been successfully terminated .";
-                Cassie.Message(message);
-
+            string message = "SCP 0 5 6 has been successfully terminated";
+            Cassie.Message(message);
         }
 
 
         private void OnHurting(HurtingEventArgs ev)
         {
-            if (ev.Attacker?.IsScp == true && ev.Player.Role.Type == RoleTypeId.Tutorial)
-            {
+            if ((Check(ev.Player) && ev.Attacker.Role.Team == Team.SCPs) ||
+                (ev.Attacker != null && Check(ev.Attacker) && ev.Player.Role.Team == Team.SCPs) ||
+                (ev.Attacker != null && Check(ev.Attacker) && Check(ev.Player) && ev.Player != ev.Attacker))
                 ev.IsAllowed = false;
-            }
+        }
+
+        private void OnEnteringPocketDimension(EnteringPocketDimensionEventArgs ev)
+        {
+            if (Check(ev.Player))
+                ev.IsAllowed = false;
+        }
+
+        private void OnShooting(ShootingEventArgs ev)
+        {
+            Player? target = Player.Get(ev.TargetNetId);
+            if (target != null && target.Role == RoleTypeId.Scp096 && Check(ev.Player))
+                ev.IsAllowed = false;
+        }
+
+        private void OnActivatingGenerator(ActivatingGeneratorEventArgs ev)
+        {
+            if (Check(ev.Player))
+                ev.IsAllowed = false;
         }
 
 
@@ -227,7 +254,7 @@
                 }
                 if (VisibleRole == RoleTypeId.ClassD)
                 {
-                    player.CustomInfo = $"{player.Nickname}\nClass D Personnel";
+                    player.CustomInfo = $"{player.Nickname}\nClass-D Personnel";
                 }
                 player.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Nickname;
                 player.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;

@@ -23,7 +23,13 @@ namespace SCP056Plugin
         [Description("Configs for the SCP-056 role players turn into.")]
         public Scp056Role Scp056RoleConfig { get; set; } = new();
 
-        
+        [Description("The player count when 056 starts to spawn")]
+        public int PlayerCount { get; set; } = 16;
+
+        [Description("The player count when 056 starts to spawn")]
+        public int SpawnChance { get; set; } = 10;
+
+
 
     }
 }
