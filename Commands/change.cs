@@ -11,8 +11,9 @@ using Exiled.CustomRoles.Commands;
 using System;
 using Exiled.API.Extensions;
 
-namespace SCP056Plugin2.Commands
+namespace SCP056Plugin.Commands
 {
+
     [CommandHandler(typeof(ClientCommandHandler))]
     public class change : ICommand
     {
@@ -27,12 +28,12 @@ namespace SCP056Plugin2.Commands
             Player player = Player.Get(sender);
             if (!CustomRole.Get(56).Check(player))
             {
-                response = "Nem vagy 056!";
+                response = "You are not 056!";
                 return false;
             }
 
 
-            response = "A kinézeted megváltozott ClassD-re!";
+            response = SCP056Plugin.Instance.Config.ClassDMessage;
             player.ChangeAppearance(RoleTypeId.ClassD);
             player.CustomInfo = $"{player.Nickname}\nClass D Personnel";
             return true;
